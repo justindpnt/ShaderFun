@@ -2,7 +2,9 @@ Shader "Unlit/USB_simple_color"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        //_MainTex ("Texture", 2D) = "white" {}
+        [KeywordEnum(Off, Red, Blue)]
+        _Options ("Color Options", Float) = 0
     }
     SubShader
     {
@@ -16,6 +18,8 @@ Shader "Unlit/USB_simple_color"
             #pragma fragment frag
             // make fog work
             #pragma multi_compile_fog
+
+            #pragma multi_compile _OPTIONS_OFF _OPTIONS_RED _OPTIONS_BLUE
 
             #include "UnityCG.cginc"
 
@@ -50,8 +54,15 @@ Shader "Unlit/USB_simple_color"
                 fixed4 col = tex2D(_MainTex, i.uv);
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
-                return col;
+                #if _OPTIONS_OFF
+                    return col;
+                #elif _OPTIONS_RED
+                    return col * float4(1, 0, 0, 1);
+                #elif _OPTIONS_BLUE
+                    return col * float4(0, 0, 1, 1);
+                #endif
             }
+
             ENDCG
         }
     }
